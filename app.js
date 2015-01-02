@@ -1,3 +1,29 @@
+var azure = require('azure');
+var serviceBusService = azure.createServiceBusService();
+
+serviceBusService.createQueueIfNotExists('nqueen', function(error){
+  if(!error){
+    console.log('createQueueIfNotExists');
+  } else {
+    console.log(error);
+  }
+});
+
+var message = {
+  body: 'Test message',
+  customProperties: {
+      testproperty: 'TestValue'
+  }
+};
+
+serviceBusService.sendQueueMessage('nqueen', message, function(error){
+    if(!error){
+      console.log('sendQueueMessage');
+    } else {
+      console.log(error);
+    }
+});
+
 var express = require('express');
 var app = express();
 
