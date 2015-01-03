@@ -9,25 +9,25 @@ serviceBusService.createQueueIfNotExists('nqueen', function(error){
   }
 });
 
-var message = {
-  body: 'Test message',
-  customProperties: {
-      testproperty: 'TestValue'
-  }
-};
-
-serviceBusService.sendQueueMessage('nqueen', message, function(error){
-    if(!error){
-      console.log('sendQueueMessage');
-    } else {
-      console.log(error);
-    }
-});
-
 var express = require('express');
 var app = express();
 
 app.get('/', function(req, res){
+
+  var message = {
+    body: 'Test message',
+    customProperties: {
+        testproperty: 'TestValue'
+    }
+  };
+
+  serviceBusService.sendQueueMessage('nqueen', message, function(error){
+      if(!error){
+        console.log('sendQueueMessage');
+      } else {
+        console.log(error);
+      }
+  });
 
   var n = 12;
   var time1 = 0;
