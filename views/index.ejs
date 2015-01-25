@@ -2,11 +2,14 @@
 <html>
 <head>
   <title><%= title %></title>
-  <link rel="stylesheet" href="/stylesheets/style.css" />
   <script src="js/jquery.min.js"></script>
   <script src="js/Chart.min.js"></script>
 </head>
 <body>
+
+  <h1>Welcome to <%= title %></h1>
+
+  <p>Currently running test with an n of <strong>4 to <%= n %></strong> on <strong><%= cores %></strong> cores</p>
 
   <canvas id="myChart" width="800" height="600"></canvas>
 
@@ -25,7 +28,7 @@
       ]
     };
     var myLineChart = new Chart($("#myChart").get(0).getContext("2d")).Bar(data);
-    var max = 16;
+    var max = <%= n %>;
 
     var getData = function(n) {
       if (n <= max) {

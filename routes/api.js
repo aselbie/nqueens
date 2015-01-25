@@ -55,7 +55,7 @@ router.get('/:n', function(req, res){
   }).reduce(function(d){
     return d[0] + d[1];
   }).then(function(solutions){
-    var time = Date.now() - start;
+    var time = ((Date.now() - start) / 1000).toFixed(2);
     res.json({
       time: time,
       solutions: solutions,
