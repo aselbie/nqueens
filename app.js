@@ -1,87 +1,61 @@
-var azure = require('azure');
-var serviceBusService = azure.createServiceBusService();
-
-serviceBusService.createQueueIfNotExists('nqueen', function(error){
-  if(!error){
-    console.log('createQueueIfNotExists');
-  } else {
-    console.log(error);
-  }
-});
-
 var express = require('express');
+var path = require('path');
+var favicon = require('serve-favicon');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+
+var routes = require('./routes/index');
+var users = require('./routes/users');
+
 var app = express();
 
-app.get('/', function(req, res){
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
-  var message = {
-    body: 'Test message',
-    customProperties: {
-        testproperty: 'TestValue'
-    }
-  };
+// uncomment after placing your favicon in /public
+//app.use(favicon(__dirname + '/public/favicon.ico'));
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(require('stylus').middleware(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
-  serviceBusService.sendQueueMessage('nqueen', message, function(error){
-      if(!error){
-        console.log('sendQueueMessage');
-      } else {
-        console.log(error);
-      }
-  });
+app.use('/', routes);
+app.use('/users', users);
 
-  var n = 12;
-  var time1 = 0;
-  var time2 = 0;
-
-  result1 = 0;
-  result2 = 0;
-
-  var q = function(n){
-    var start = Date.now();
-    s=0;
-    function f(l,o,r,c,t,v){
-      v=~(l|o|r)&c;
-      while(v>0){
-        v^=t=-v&v;
-        f((l|t)<<1, o|t, (r|t)>>1, c)
-      }
-      o==c&&s++
-    }
-    f(0,0,0,(1<<n)-1);
-    time1 = Date.now() - start;
-    result1 = s;
-  }
-
-  var nQueens = function(n) {
-    var start = Date.now();
-    var solutions = 0;
-    var magicScreen = (1 << n) - 1;
-    var recurQueens = function(columns, leftDiagonals, rightDiagonals) {
-      var threatened = columns | leftDiagonals | rightDiagonals;
-      var open = ~(threatened) & magicScreen;
-      while(open > 0) {
-        var theOne = -open & open;
-        open = open ^ theOne;
-        var openColumns = columns | theOne;
-        var openLeftDiagonals = (leftDiagonals | theOne) << 1;
-        var openRightDiagonals = (rightDiagonals | theOne) >> 1;
-        recurQueens(openColumns, openLeftDiagonals, openRightDiagonals);
-      }
-      if(columns === magicScreen) {
-        solutions++;
-      }
-    }
-    recurQueens(0,0,0);
-    time2 = Date.now() - start;
-    result2 = s;
-  }
-  
-
-  q(n);
-  nQueens(n);
-
-  res.send('It took the first method ' + time1 + 'ms to find ' + result1 + ' solutions for ' + n + ' queens.<br>It took the second method ' + time2 + 'ms to find ' + result2 + ' solutions for ' + n + ' queens');
-
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 
-app.listen(process.env.PORT || 3000);
+// error handlers
+
+// development error handler
+// will print stacktrace
+if (app.get('env') === 'development') {
+    app.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: err
+        });
+    });
+}
+
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+        message: err.message,
+        error: {}
+    });
+});
+
+
+module.exports = app;
